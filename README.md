@@ -7,20 +7,17 @@
 ## Screenshots
 
 ### Web UI
+![Frontend](docs/images/frontend.png)
+![Ticket creation](docs/images/createticket.png)
+![Customer Portal](docs/images/customertab.png)
+![Support Agent](docs/images/supportab.png)
 
-Frontend
-Ticket creation
-Customer Portal
-Support Agent
-
-### Monitoring (Grafana + Loki +  Prometheus)
-
-Loki Logs
-Prometheus
+### Monitoring (Grafana + Loki + Prometheus)
+![Loki Logs](docs/images/loki-grafana.png)
+![Prometheus](docs/images/prometheus-grafana.png)
 
 ### Message Broker (RabbitMQ)
-
-RabbitMQ
+![RabbitMQ](docs/images/RabbitMQ.png)
 
 ## Project structure
 
@@ -51,7 +48,7 @@ RabbitMQ
 
 ### Architecture
 
-Architecture
+![Architecture](docs/images/arch.png)
 
 ### Synchronous (HTTP)
 
