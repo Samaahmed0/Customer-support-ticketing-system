@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+!.env.*
+k8s/secret.yaml
+.pytest_cache/
+.idea/
+.vscode/

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketing-config
+  namespace: ticketing
+data:
+  POSTGRES_USER: "ticketing"
+  POSTGRES_DB: "ticketing"
+  RABBITMQ_USER: "ticketing"
+  LOG_LEVEL: "INFO"
+  TICKET_SERVICE_URL: "http://ticket-service:8000"

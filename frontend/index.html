@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ticketing</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css?v=7" />
+  </head>
+  <body>
+    <div id="app" class="portal portal--customer">
+      <header class="topbar">
+        <h1 class="site-title">Support ticketing</h1>
+      </header>
+
+      <nav class="tab-bar" role="tablist" aria-label="Portal">
+        <button
+          type="button"
+          class="tab tab--active"
+          role="tab"
+          aria-selected="true"
+          id="tab-customer"
+          data-tab="customer"
+        >
+          Customer portal
+        </button>
+        <button type="button" class="tab" role="tab" aria-selected="false" id="tab-support" data-tab="support">
+          Support agent
+        </button>
+      </nav>
+
+      <div class="portal-toolbar for-customer">
+        <button type="button" class="btn btn-primary" id="btn-open-create">New ticket</button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-list-customer">Reload list</button>
+      </div>
+      <div class="portal-toolbar for-support">
+        <button type="button" class="btn btn-secondary" id="btn-refresh-summary" title="Refresh summary">
+          Refresh summary
+        </button>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-refresh-list-support">Reload list</button>
+      </div>
+
+      <div id="banner" class="banner banner-hidden" role="alert"></div>
+      <div id="loading-bar" class="loading-bar loading-bar-hidden" aria-hidden="true"></div>
+
+      <section class="summary for-support" id="summary-section" aria-label="Reporting summary">
+        <div class="summary-grid" id="summary-grid">
+          <div class="summary-card">
+            <span class="summary-label">Tickets created</span>
+            <span class="summary-value" id="sum-created">—</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Tickets updated</span>
+            <span class="summary-value" id="sum-updated">—</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Support messages</span>
+            <span class="summary-value" id="sum-messages">—</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-label">Resolved</span>
+            <span class="summary-value" id="sum-resolved">—</span>
+          </div>
+        </div>
+        <p class="summary-meta" id="summary-meta"></p>
+      </section>
+
+      <main class="layout">
+        <aside class="panel panel-list">
+          <div class="panel-head">
+            <h2 id="list-panel-title">Your tickets</h2>
+          </div>
+          <div class="list-wrap">
+            <ul class="ticket-list" id="ticket-list"></ul>
+            <p class="empty" id="ticket-list-empty">No tickets yet. Create one to get started.</p>
+          </div>
+        </aside>
+
+        <section class="panel panel-detail" id="detail-panel" hidden>
+          <div class="panel-head">
+            <h2>Ticket <span id="detail-id"></span></h2>
+            <div class="detail-actions support-only">
+              <button type="button" class="btn btn-secondary btn-sm" id="btn-edit-ticket">Edit</button>
+            </div>
+          </div>
+          <div class="detail-body">
+            <div class="detail-meta">
+              <span id="detail-status"></span>
+              <span class="muted" id="detail-dates"></span>
+            </div>
+            <h3 class="detail-title" id="detail-title"></h3>
+            <p class="detail-description" id="detail-description"></p>
+
+            <div class="subsection">
+              <h3>Assignment</h3>
+              <p class="assignee-line muted for-customer" id="assignee-line-customer" hidden></p>
+              <p class="assignee-line muted for-support" id="assignee-line">Open a ticket to load assignee.</p>
+              <div
+                id="customer-assign-notice"
+                class="customer-assign-notice for-customer"
+                role="status"
+                hidden
+              ></div>
+              <div class="support-only">
+                <div class="support-agent-actions">
+                  <div class="support-action-card">
+                    <div class="support-action-card__label">Assign to agent</div>
+                    <form class="support-action-card__row" id="form-assign">
+                      <input type="text" name="agent_id" placeholder="Agent id" required maxlength="200" />
+                      <button type="submit" class="btn btn-primary btn-sm">Assign</button>
+                    </form>
+                  </div>
+                  <div class="support-action-card">
+                    <div class="support-action-card__label">Resolution</div>
+                    <button type="button" class="btn-resolve-ticket-wide" id="btn-resolve-ticket">Resolve ticket</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <h3 id="messages-section-title">Conversation</h3>
+              <ul class="message-list" id="message-list"></ul>
+              <form class="stack-form" id="form-message">
+                <input type="text" name="agent_id" placeholder="Your name" required maxlength="200" />
+                <textarea name="body" rows="3" placeholder="Your message" required maxlength="10000"></textarea>
+                <button type="submit" class="btn btn-primary btn-sm">Send reply</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel-placeholder" id="detail-placeholder">
+          <p>Select a ticket from the list to view status, assignment, and messages.</p>
+        </section>
+      </main>
+    </div>
+
+    <!-- Create ticket -->
+    <dialog class="modal" id="modal-create">
+      <form method="dialog" id="form-create" class="modal-form">
+        <h2>New ticket</h2>
+        <label>
+          Title
+          <input type="text" name="title" required maxlength="500" />
+        </label>
+        <label>
+          Description
+          <textarea name="description" rows="4" maxlength="10000" placeholder="Optional"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" value="cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" value="default">Create</button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Edit ticket -->
+    <dialog class="modal" id="modal-edit">
+      <form method="dialog" id="form-edit" class="modal-form">
+        <h2>Edit ticket</h2>
+        <label>
+          Title
+          <input type="text" name="title" maxlength="500" />
+        </label>
+        <label>
+          Description
+          <textarea name="description" rows="4" maxlength="10000"></textarea>
+        </label>
+            <label>
+          Status
+          <select name="status">
+            <option value="">(unchanged)</option>
+            <option value="open">open</option>
+            <option value="in_progress">in_progress</option>
+            <option value="resolved">resolved</option>
+            <option value="closed">closed</option>
+          </select>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" value="cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" value="default">Save</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/js/app.js?v=7" defer></script>
+  </body>
+</html>
