@@ -39,7 +39,7 @@ async def run_consumer() -> None:
                 async with message.process():
                     rk = message.routing_key or ""
                     payload = json.loads(message.body.decode("utf-8"))
-                    # In production: send email/push/webhook. Here: structured log for Loki/Promtail.
+                    # in production send email,here structured log for loki
                     logger.info(
                         "NOTIFY routing_key=%s payload=%s",
                         rk,

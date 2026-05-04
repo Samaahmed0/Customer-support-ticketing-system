@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# Optional: run Development, Testing, and Production-style stacks at the same time
-# on one Linux host. Each stack uses a different Compose project name and host ports
-# (see .env.parallel.*). Resource-heavy: use for demos only.
+# run Development, Testing and Production at the same time
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"

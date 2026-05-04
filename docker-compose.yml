@@ -1,8 +1,3 @@
-# Customer Support Ticketing — single stack. Pick an environment file:
-#   docker compose --env-file .env.development up -d
-# Switch environments: docker compose --env-file .env.development down
-# then up with another env file.
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -23,7 +18,6 @@ services:
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
     environment:
-      # Non-guest user required for AMQP from other containers (guest is localhost-only).
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-ticketing}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-ticketing}
     ports:
@@ -176,7 +170,6 @@ services:
       - ticketing
 
   loki:
-    # Shipped local-config is enough for coursework; avoids Loki 3.x schema drift.
     image: grafana/loki:2.9.4
     command: -config.file=/etc/loki/local-config.yaml
     ports:

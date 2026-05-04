@@ -4,50 +4,54 @@
 
 ---
 
+## Screenshots
+
+### Web UI
+
+Frontend
+Ticket creation
+Customer Portal
+Support Agent
+
+### Monitoring (Grafana + Loki +  Prometheus)
+
+Loki Logs
+Prometheus
+
+### Message Broker (RabbitMQ)
+
+RabbitMQ
+
 ## Project structure
 
-- **`services/ticket-service/`**
-  - Ticket CRUD and status tracking.
-  - Stores tickets in Postgres.
-  - Publishes ticket events to RabbitMQ.
 
-- **`services/support-service/`**
-  - Support workflow: assignments, messages and resolution.
-  - Stores support tables in Postgres.
-  - Calls ticket-service over HTTP when it needs ticket data/status updates.
-  - Publishes support events to RabbitMQ.
+| Folder                           | What it does                                                     |
+| -------------------------------- | ---------------------------------------------------------------- |
+| `services/ticket-service/`       | Creates and tracks tickets, stores in Postgres, publishes events |
+| `services/support-service/`      | Handles assignments, messages and resolution                     |
+| `services/reporting-service/`    | Counts events from RabbitMQ, exposes summary endpoint            |
+| `services/notification-service/` | Listens to events and logs a notification for each one           |
+| `frontend/`                      | HTML/CSS/JS web UI served by nginx with two tabs                 |
+| `k8s/`                           | Kubernetes manifests for deploying the full stack                |
+| `monitoring/`                    | Prometheus, Grafana and Loki configuration                       |
 
-- **`services/reporting-service/`**
-  - Consumes events from RabbitMQ and updates aggregate counters in Postgres.
-  - Exposes `/reports/summary` and Prometheus metrics.
-
-- **`services/notification-service/`**
-  - Consumes the same events as reporting.
-  - In this demo it “delivers” notifications by writing structured logs (for Loki).
-
-- **`shared/`**
-  - Shared Pydantic schemas and routing-key constants (`ticketing_shared`).
-
-- **`frontend/`**
-  - Static HTML/CSS/vanilla-JS UI served through an nginx container.
-  - Includes two tabs: **Customer portal** and **Support agent**.
-  - Uses a reverse proxy (`/api/ticket`, `/api/support`, `/api/reporting`) so the browser stays same-origin.
-
-- **`docker-compose.yml`**
-  - Full local stack: Postgres, RabbitMQ, four services, web UI and optional observability components.
-
-- **`k8s/`**
-  - Kubernetes manifests for namespace, config, secrets, Postgres, RabbitMQ and app Deployments/Services.
-
-- **`monitoring/`**
-  - Prometheus scrape config, Grafana provisioning, Promtail config.
 
 ---
 
 ## Service responsibilities and communication
 
+
+| Event              | Published by    | Consumed by                             |
+| ------------------ | --------------- | --------------------------------------- |
+| `ticket.created`   | ticket-service  | reporting-service, notification-service |
+| `ticket.updated`   | ticket-service  | reporting-service, notification-service |
+| `support.message`  | support-service | reporting-service, notification-service |
+| `support.resolved` | support-service | reporting-service, notification-service |
+
+
 ### Architecture
-![Architecture](docs/images/arch.png)
+
+Architecture
 
 ### Synchronous (HTTP)
 
@@ -66,17 +70,15 @@
 
 ### Prerequisites
 
-- Linux is recommended (Ubuntu). Windows is fine if Docker is working properly.
-- Docker Engine + Docker Compose plugin:
-  - `docker compose version`
+You need Docker and Docker Compose installed on a Linux machine (Ubuntu recommended). Run `docker compose version` to verify.
 
 ### Environments (.env files)
 
 The same `docker-compose.yml` runs in different modes depending on the chosen env file:
 
-- **`.env.development`**: debug logs, auto-reload
-- **`.env.testing`**: CI-like (no reload, INFO logs)
-- **`.env.production`**: production-style (no reload, more workers, quieter logs)
+- `**.env.development**`: debug logs, auto-reload
+- `**.env.testing**`: CI-like (no reload, INFO logs)
+- `**.env.production**`: production-style (no reload, more workers, quieter logs)
 
 Start one stack:
 
@@ -105,34 +107,24 @@ docker compose --env-file .env.development down
 ### Quick demo flow
 
 1. Create a ticket:
-   - `POST http://localhost:8001/tickets`
-   - Body: `{"title":"Login bug","description":"Cannot sign in"}`
+  - `POST http://localhost:8001/tickets`
+  - Body: `{"title":"Login bug","description":"Cannot sign in"}`
 2. Assign an agent:
-   - `POST http://localhost:8002/tickets/1/assign`
-   - Body: `{"agent_id":"agent-01"}`
+  - `POST http://localhost:8002/tickets/1/assign`
+  - Body: `{"agent_id":"agent-01"}`
 3. Post a support message:
-   - `POST http://localhost:8002/tickets/1/messages`
-   - Body: `{"agent_id":"agent-01","body":"We are investigating."}`
+  - `POST http://localhost:8002/tickets/1/messages`
+  - Body: `{"agent_id":"agent-01","body":"We are investigating."}`
 4. Resolve the ticket:
-   - `POST http://localhost:8002/tickets/1/resolve`
+  - `POST http://localhost:8002/tickets/1/resolve`
 5. View reporting counters:
-   - `GET http://localhost:8003/reports/summary`
+  - `GET http://localhost:8003/reports/summary`
 
 ---
 
 ## Observability (Compose)
 
-This repository includes a simple observability stack in Compose:
-
-- **Prometheus** scrapes `/metrics` from each service
-- **Grafana** visualizes metrics and logs
-- **Loki** stores logs
-- **Promtail** ships Docker container logs to Loki (needs Docker socket access)
-
-To test the notification demo:
-
-- Generate events (create/update ticket, send support message, resolve).
-- In Grafana → Explore → Loki, query logs for the notification container.
+The stack includes Prometheus for metrics, Loki for logs and Grafana to view both. Logs from all containers are collected automatically and sent to Loki. To see notification logs: open Grafana → Explore → select Loki → run the query `{container_name=~".*notification.*"}`
 
 ---
 
@@ -210,13 +202,13 @@ kubectl apply -f k8s/apps.yaml
 
 ### 5) Access services
 
-Use port-forwarding for local access:
+Use port-forwarding for local access. Use a different port if Docker Compose is already running on the default ports:
 
 ```bash
-kubectl -n ticketing port-forward svc/ticket-service 8001:8000
+kubectl -n ticketing port-forward svc/ticket-service 9001:8000
 ```
 
-Then open `http://localhost:8001/docs`.
+Then open `http://localhost:9001/docs`.
 
 ### Notes
 
