@@ -7,13 +7,27 @@
 ## Screenshots
 
 ### Web UI
+
+The main landing page showing the overall layout and stats summary.
 ![Frontend](docs/images/frontend.png)
+
+Ticket creation form where customers submit a new support request.
 ![Ticket creation](docs/images/createticket.png)
+
+Customer portal tab 
+Customers can view their tickets and reply to messages.
 ![Customer Portal](docs/images/customertab.png)
+
+Support agent tab
+Agents can assign, message and resolve tickets.
 ![Support Agent](docs/images/supportab.png)
 
 ### Monitoring (Grafana + Loki + Prometheus)
+
+Loki logs in Grafana showing notification events 
 ![Loki Logs](docs/images/loki-grafana.png)
+
+Prometheus metrics showing ticket counters scraped from the services.
 ![Prometheus](docs/images/prometheus-grafana.png)
 
 ### Message Broker (RabbitMQ)
