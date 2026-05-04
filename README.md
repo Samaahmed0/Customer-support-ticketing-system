@@ -25,6 +25,7 @@ Support agent tab - agents can assign, message and resolve tickets.
 Loki logs in Grafana showing notification events 
 ![Loki query](docs/images/loki-grafana.png)
 ![Loki Logs](docs/images/logs.png)
+
 Prometheus metrics showing ticket counters scraped from the services.
 ![Prometheus](docs/images/prometheus-grafana.png)
 
@@ -158,8 +159,7 @@ This uses:
 
 ### Prerequisites
 
-- `kubectl`
-- A Kubernetes cluster (kind, minikube, k3d)
+- `kubectl` and Docker Desktop with Kubernetes enabled (Settings → Kubernetes → Enable Kubernetes)
 
 ### 1) Build images
 
@@ -172,18 +172,9 @@ docker build -f docker/reporting-service/Dockerfile -t ticketing-reporting-servi
 docker build -f docker/notification-service/Dockerfile -t ticketing-notification-service:latest .
 ```
 
-### 2) Make images available to the cluster
+### 2) Image availability
 
-If using **kind**, load them:
-
-```bash
-kind load docker-image ticketing-ticket-service:latest
-kind load docker-image ticketing-support-service:latest
-kind load docker-image ticketing-reporting-service:latest
-kind load docker-image ticketing-notification-service:latest
-```
-
-If using a remote cluster, push images to a registry and update image names in the manifests.
+Images you build locally with `docker build` are available to Docker Desktop Kubernetes on the same machine without any extra import step. If you use a remote cluster instead, push the images to a registry and update image names in the manifests.
 
 ### 3) Create secrets
 
