@@ -134,7 +134,7 @@ docker compose --env-file .env.development down
 
 ## Observability (Compose)
 
-The stack includes Prometheus for metrics, Loki for logs and Grafana to view both. Logs from all containers are collected automatically and sent to Loki. To see notification logs: open Grafana → Explore → select Loki → run the query `{container_name=~".*notification.*"}`
+The stack includes Prometheus for metrics, Loki for logs and Grafana to view both. Logs from all containers are collected automatically and sent to Loki. To see notification logs: open Grafana → Explore → select Loki → run the query `{container_name=~".*notification.*"}` or `{log_stream="stdout"} |= "NOTIFY"`
 
 ---
 
@@ -159,7 +159,13 @@ This uses:
 
 ### Prerequisites
 
-- `kubectl` and Docker Desktop with Kubernetes enabled (Settings → Kubernetes → Enable Kubernetes)
+- `kubectl`
+- `minikube` (`minikube start --driver=docker`)
+- Docker installed and running
+
+```bash
+minikube start --driver=docker
+```
 
 ### 1) Build images
 
@@ -174,7 +180,12 @@ docker build -f docker/notification-service/Dockerfile -t ticketing-notification
 
 ### 2) Image availability
 
-Images you build locally with `docker build` are available to Docker Desktop Kubernetes on the same machine without any extra import step. If you use a remote cluster instead, push the images to a registry and update image names in the manifests.
+```bash
+minikube image load ticketing-ticket-service:latest
+minikube image load ticketing-support-service:latest
+minikube image load ticketing-reporting-service:latest
+minikube image load ticketing-notification-service:latest
+```
 
 ### 3) Create secrets
 
@@ -222,6 +233,7 @@ Then open `http://localhost:9001/docs`.
 Remove the namespace and everything inside it:
 
 ```bash
+minikube stop
 kubectl delete namespace ticketing
 ```
 
