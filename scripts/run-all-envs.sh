@@ -4,9 +4,9 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-docker compose -p ticketing-parallel-dev --env-file .env.parallel.dev up -d --build
-docker compose -p ticketing-parallel-test --env-file .env.parallel.test up -d --build
-docker compose -p ticketing-parallel-prod --env-file .env.parallel.prod up -d --build
+docker compose -p ticketing-parallel-dev --env-file .env.parallel.dev up -d
+docker compose -p ticketing-parallel-test --env-file .env.parallel.test up -d
+docker compose -p ticketing-parallel-prod --env-file .env.parallel.prod up -d
 
 echo "Started three stacks."
 echo "  Dev  Web UI: http://localhost:18080 · APIs: http://localhost:18001 (ticket) … Grafana http://localhost:13000"
